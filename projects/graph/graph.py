@@ -3,8 +3,8 @@ Simple graph implementation
 """
 from util import Stack, Queue  # These may come in handy
 
-class Graph:
 
+class Graph:
     """Represent a graph as a dictionary of vertices mapping labels to edges."""
     def __init__(self):
         self.vertices = {}
@@ -13,42 +13,74 @@ class Graph:
         """
         Add a vertex to the graph.
         """
-        pass  # TODO
+        self.vertices[vertex_id] = set()
 
     def add_edge(self, v1, v2):
         """
         Add a directed edge to the graph.
         """
-        pass  # TODO
+        if v1 in self.vertices and v2 in self.vertices:
+            self.vertices[v1].add(v2)
+        else:
+            raise IndexError("Vertex does not exist")
 
     def get_neighbors(self, vertex_id):
         """
         Get all neighbors (edges) of a vertex.
         """
-        pass  # TODO
+        return self.vertices[vertex_id]
 
     def bft(self, starting_vertex):
         """
         Print each vertex in breadth-first order
         beginning from starting_vertex.
         """
-        pass  # TODO
+        q = Queue()
+        q.enqueue(starting_vertex)
+
+        visited = set()
+
+        while q.size() > 0:
+            v = q.dequeue()
+            if v not in visited:
+                print(v)
+                visited.add(v)
+                for next_vertex in self.get_neighbors(v):
+                    q.enqueue(next_vertex)
 
     def dft(self, starting_vertex):
         """
         Print each vertex in depth-first order
         beginning from starting_vertex.
         """
-        pass  # TODO
+        s = Stack()
+        s.push(starting_vertex)
 
-    def dft_recursive(self, starting_vertex):
+        visited = set()
+
+        while s.size() > 0:
+            v = s.pop()
+            if v not in visited:
+                print(v)
+                visited.add(v)
+                for next_vertex in self.get_neighbors(v):
+                    s.push(next_vertex)
+
+    def dft_recursive(self, starting_vertex, visited=None):
         """
         Print each vertex in depth-first order
         beginning from starting_vertex.
 
         This should be done using recursion.
         """
-        pass  # TODO
+        if visited is None:
+            visited = set()
+
+        visited.add(starting_vertex)
+        print(starting_vertex)
+        for next_vertex in self.get_neighbors(starting_vertex):
+            if next_vertex not in visited:
+                self.dft_recursive(next_vertex, visited)
 
     def bfs(self, starting_vertex, destination_vertex):
         """
@@ -56,7 +88,22 @@ class Graph:
         starting_vertex to destination_vertex in
         breath-first order.
         """
-        pass  # TODO
+        q = Queue()
+        q.enqueue([starting_vertex])
+
+        visited = set()
+        while q.size() > 0:
+            path = q.dequeue()
+            last_vertex = path[-1]
+            if last_vertex not in visited:
+                for next_vertex in self.get_neighbors(last_vertex):
+                    new_path = path.copy()
+                    new_path.append(next_vertex)
+                    if next_vertex is destination_vertex:
+                        return new_path
+                    q.enqueue(new_path)
+                visited.add(last_vertex)
+        return None
 
     def dfs(self, starting_vertex, destination_vertex):
         """
@@ -64,9 +111,24 @@ class Graph:
         starting_vertex to destination_vertex in
         depth-first order.
         """
-        pass  # TODO
+        s = Stack()
+        s.push([starting_vertex])
 
-    def dfs_recursive(self, starting_vertex, destination_vertex):
+        visited = set()
+        while s.size() > 0:
+            path = s.pop()
+            last_vertex = path[-1]
+            if last_vertex not in visited:
+                for next_vertex in self.get_neighbors(last_vertex):
+                    new_path = path.copy()
+                    new_path.append(next_vertex)
+                    if next_vertex is destination_vertex:
+                        return new_path
+                    s.push(new_path)
+                visited.add(last_vertex)
+        return None
+
+    def dfs_recursive(self, starting_vertex, destination_vertex, path=None):
         """
         Return a list containing a path from
         starting_vertex to destination_vertex in
@@ -74,7 +136,8 @@ class Graph:
 
         This should be done using recursion.
         """
-        pass  # TODO
+        pass
+
 
 if __name__ == '__main__':
     graph = Graph()  # Instantiate your graph
@@ -96,13 +159,11 @@ if __name__ == '__main__':
     graph.add_edge(3, 5)
     graph.add_edge(2, 3)
     graph.add_edge(4, 6)
-
     '''
     Should print:
         {1: {2}, 2: {3, 4}, 3: {5}, 4: {6, 7}, 5: {3}, 6: {3}, 7: {1, 6}}
     '''
     print(graph.vertices)
-
     '''
     Valid BFT paths:
         1, 2, 3, 4, 5, 6, 7
@@ -119,7 +180,6 @@ if __name__ == '__main__':
         1, 2, 4, 3, 7, 5, 6
     '''
     graph.bft(1)
-
     '''
     Valid DFT paths:
         1, 2, 3, 5, 4, 6, 7
@@ -129,13 +189,11 @@ if __name__ == '__main__':
     '''
     graph.dft(1)
     graph.dft_recursive(1)
-
     '''
     Valid BFS path:
         [1, 2, 4, 6]
     '''
     print(graph.bfs(1, 6))
-
     '''
     Valid DFS paths:
         [1, 2, 4, 6]
